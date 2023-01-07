@@ -166,6 +166,22 @@ export const postEdit = async (req, res) => {
     body: { name, email, username, location },
   } = req;
 
+  // check if username or email exists
+  const findUsername = await User.findOne({ username });
+  const findEmail = await User.findOne({ email });
+  // console.log(findEmail);
+  // console.log(`_id: ${_id}`);
+  // console.log(`findEmail._id: ${username._id}`);
+  if (
+    (findUsername !== null && findUsername._id !== _id) ||
+    (findEmail !== null && findEmail._id !== _id)
+  ) {
+    return res.render("edit-profile", {
+      pageTitle: "Edit Profile",
+      errorMessage: "User exists",
+    });
+  }
+
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
@@ -178,6 +194,46 @@ export const postEdit = async (req, res) => {
   );
   req.session.user = updatedUser;
   return res.redirect("/users/edit");
+};
+
+//change password given
+export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+
+  const user = await User.findById(_id);
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The new password does not match the confirmation",
+    });
+  }
+
+  // console.log("Old password: ", user.password);
+  user.password = newPassword;
+  // console.log("New unhashed PW: ", user.password);
+  await user.save();
+  // console.log("New hashed PW: ", user.password);
+  //send notification
+  return res.redirect("/users/logout");
 };
 
 export const see = (req, res) => res.send("See user");
