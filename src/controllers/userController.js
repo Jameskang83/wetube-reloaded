@@ -161,30 +161,32 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     },
     body: { name, email, username, location },
+    file,
   } = req;
 
   // check if username or email exists
-  const findUsername = await User.findOne({ username });
-  const findEmail = await User.findOne({ email });
+  // const findUsername = await User.findOne({ username });
+  // const findEmail = await User.findOne({ email });
   // console.log(findEmail);
   // console.log(`_id: ${_id}`);
   // console.log(`findEmail._id: ${username._id}`);
-  if (
-    (findUsername !== null && findUsername._id !== _id) ||
-    (findEmail !== null && findEmail._id !== _id)
-  ) {
-    return res.render("edit-profile", {
-      pageTitle: "Edit Profile",
-      errorMessage: "User exists",
-    });
-  }
+  // if (
+  //   (findUsername !== null && findUsername._id !== _id) ||
+  //   (findEmail !== null && findEmail._id !== _id)
+  // ) {
+  //   return res.render("edit-profile", {
+  //     pageTitle: "Edit Profile",
+  //     errorMessage: "User exists",
+  //   });
+  // }
 
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
+      avatarUrl: file ? file.path : avatarUrl,
       name,
       email,
       username,
