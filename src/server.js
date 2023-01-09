@@ -5,7 +5,7 @@ import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
-import { localsMiddleware } from "./views/middlewares";
+import { localsMiddleware } from "./middlewares";
 
 // console.log(process.cwd());
 
