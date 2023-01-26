@@ -1,5 +1,5 @@
 import User from "../models/User";
-import Video from "../models/Video";
+// import Video from "../models/Video";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
@@ -152,7 +152,11 @@ export const finishGithubLogin = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  req.session.destroy();
+  req.session.user = null;
+  res.locals.loggedInUser = req.session.user;
+  req.session.loggedIn = false;
+  // req.session.destroy();
+  req.flash("info", "Bye Bye");
   return res.redirect("/");
 };
 
@@ -203,6 +207,8 @@ export const postEdit = async (req, res) => {
 //change password given
 export const getChangePassword = (req, res) => {
   if (req.session.user.socialOnly === true) {
+    req.flash("erro", "Can't change password");
+
     return res.redirect("/");
   }
   return res.render("users/change-password", { pageTitle: "Change Password" });
@@ -235,6 +241,8 @@ export const postChangePassword = async (req, res) => {
   user.password = newPassword;
   // console.log("New unhashed PW: ", user.password);
   await user.save();
+  req.flash("info", "Password updated");
+
   // console.log("New hashed PW: ", user.password);
   //send notification
   return res.redirect("/users/logout");
