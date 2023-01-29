@@ -11,6 +11,7 @@ export const home = async (req, res) => {
   // console.log(videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
+
 export const watch = async (req, res) => {
   const { id } = req.params;
   const video = await Video.findById(id).populate("owner").populate("comments");
