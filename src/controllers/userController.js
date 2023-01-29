@@ -103,7 +103,6 @@ export const finishGithubLogin = async (req, res) => {
       },
     })
   ).json();
-  // console.log(json);
   // res.send(JSON.stringify(json));
   if ("access_token" in tokenRequest) {
     const { access_token } = tokenRequest;
