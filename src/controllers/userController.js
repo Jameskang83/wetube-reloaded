@@ -171,13 +171,23 @@ export const postEdit = async (req, res) => {
     body: { name, email, username, location },
     file,
   } = req;
+  const isHeroku = process.env.NODE_ENV === "production";
+
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      avatarUrl: file ? (isHeroku ? file.location : file.path) : avatarUrl,
+      name,
+      email,
+      username,
+      location,
+    },
+    { new: true }
+  );
 
   // check if username or email exists
   const findUsername = await User.findOne({ username });
   const findEmail = await User.findOne({ email });
-  // console.log(findEmail);
-  // console.log(`_id: ${_id}`);
-  // console.log(`findEmail._id: ${username._id}`);
 
   if (
     (findUsername != null && findUsername._id != _id) ||
@@ -188,18 +198,7 @@ export const postEdit = async (req, res) => {
       errorMessage: "User exists",
     });
   }
-  // console.log(file);
-  const updatedUser = await User.findByIdAndUpdate(
-    _id,
-    {
-      avatarUrl: file ? file.location : avatarUrl,
-      name,
-      email,
-      username,
-      location,
-    },
-    { new: true }
-  );
+
   req.session.user = updatedUser;
   return res.redirect("/users/edit");
 };
