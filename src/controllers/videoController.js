@@ -3,11 +3,6 @@ import Comment from "../models/Comment";
 import User from "../models/User";
 import { async } from "regenerator-runtime";
 
-// console.log("Start");
-// console.log(videos);
-// console.log("finished");
-// Video.find({}, (error, videos) => {
-
 export const home = async (req, res) => {
   // const videos = await Video.find({}).sort({ createdAt: "desc" });
   const videos = await Video.find({})
