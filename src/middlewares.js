@@ -3,9 +3,10 @@ import aws from "aws-sdk";
 import multerS3 from "multer-s3";
 
 const s3 = new aws.S3({
-  region: "us-west-2",
-  accessKeyId: process.env.AWS_ID,
-  secretAccessKey: process.env.AWS_SECRET,
+  credentials: {
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET,
+  },
 });
 
 const isHeroku = process.env.NODE_ENV === "production";
@@ -19,11 +20,12 @@ const s3ImageUploader = multerS3({
 const s3VideoUploader = multerS3({
   s3: s3,
   bucket: "wetube-clone-2023/videos",
-  Condition: {
-    StringEquals: {
-      "s3:x-amz-acl": ["public-read"],
-    },
-  },
+  acl: "public-read",
+  // Condition: {
+  //   StringEquals: {
+  //     "s3:x-amz-acl": ["public-read"],
+  //   },
+  // },
 });
 
 export const localsMiddleware = (req, res, next) => {
